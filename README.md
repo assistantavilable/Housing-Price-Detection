@@ -1,11 +1,60 @@
 # Housing-Price-Detection
-Housing price detection, or housing price prediction, is the process of using data and machine learning techniques to predict the price of a house or property based on various features or characteristics.
-
-The idea is to build a model that can take data about a property (e.g., square footage, number of rooms, location, etc.) and predict its market price. This is typically done using historical data, where the prices of previously sold houses are used to identify patterns and relationships that can help forecast future prices.
-
-Key Steps in Housing Price Prediction:
-Data Collection: Gather historical housing data with details like property features and their corresponding prices.
-Data Preprocessing: Clean the data (e.g., handle missing values, convert categorical data into numerical values).
-Model Training: Use machine learning models (like regression or decision trees) to learn the relationship between property features and prices.
-Prediction: Once the model is trained, you can use it to predict the price of new houses.
-Evaluation: Assess the model's performance using metrics like MAE or RMSE.
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+dataset=pd.read_csv('/Churn_Modelling.csv')
+dataset.shape
+dataset.dtypes
+#check for missing value
+dataset.isnull().sum()
+dataset.dropna(inplace=True)
+#viewing the data statistics
+dataset.describe()
+#finding out the correlation between multiple columns
+corr=dataset.corr()
+corr.shape
+#plotting the heatmap of correlation between feature
+plt.figure(figsize=(20,20))
+sns.heatmap(corr,cbar=True ,square=True, fmt='.1f',annot=True,annot_kws={'size':15},cmap='Blues')
+#spliting target variable and independent variable
+x=dataset[['RM']]
+y=dataset[['MEDV']]
+x
+y
+#splitting to training and testing data
+from sklearn.model_selection import train_test_split
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.3,random_state=4)
+#import library for linear Regression
+from sklearn.linear_model import LinearRegression
+#create a linear regressor
+lm=LinearRegression()
+#train the model using the training sets
+lm.fit(x_train,y_train)
+#value of y intercept
+lm.intercept_
+#converting the cofficient value to a dataframe
+coeffcients=pd.DataFrame([x_train.columns,lm.coef_]).T
+coeffcients=coeffcients.rename(columns={0:'Attribute',1:'Coeffcients'})
+coeffcients
+y_pred=lm.predict(x_train)
+from sklearn import metrics
+#model evaluiation on train data
+print('MAE:',metrics.mean_absolute_error(y_train,y_pred))
+print('MSE:',metrics.mean_squared_error(y_train,y_pred))
+print('RMSE:',np.sqrt(metrics.mean_squared_error(y_train,y_pred)))
+plt.scatter(y_train,y_pred)
+sns.regplot(x=y_train,y=y_pred)
+plt.xlabel('Prices')
+plt.ylabel('predicted prices')
+plt.title('prices vs Predicted Prices')
+plt.show()
+plt.scatter(y_train,y_pred)
+plt.xlabel('Prices')
+plt.ylabel('predicted prices')
+plt.title('prices vs Predicted Prices')
+plt.show()
+sns.distplot(y_train-y_pred)
+plt.xlabel('Residuals')
+plt.ylabel('Frequency')
+plt.title('Distribution of Residuals')
