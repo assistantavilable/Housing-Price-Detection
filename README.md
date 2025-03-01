@@ -1,32 +1,60 @@
-House price detection typically involves analyzing factors that influence the value of a property, such as location, size, age, and amenities, to predict or estimate the price of a house. This can be done using statistical models, machine learning algorithms, or other predictive techniques.
-
-To implement house price detection, here's a general approach:
-
-1. Data Collection
-Gather historical data on property prices. This data could include features such as:
-Square footage of the house
-Number of bedrooms and bathrooms
-Year the house was built
-Location (e.g., neighborhood, proximity to amenities)
-Lot size
-Condition of the house (e.g., newly renovated or old)
-Local market trends
-Economic factors (e.g., interest rates)
-Sources for data can include real estate websites (Zillow, Redfin), government databases, or private datasets.
-2. Data Preprocessing
-Cleaning the Data: Remove missing values, handle outliers, and ensure the data is consistent.
-Feature Engineering: You may want to create additional features or modify existing ones (e.g., converting categorical data like neighborhood into numerical values).
-Normalization/Standardization: Scale features such as size or price so they are on a comparable scale.
-3. Model Selection
-Linear Regression: A basic but widely-used model that can estimate the price of a house based on its features.
-Decision Trees or Random Forests: These are non-linear models that might perform better in capturing complex relationships in the data.
-Gradient Boosting Machines (GBM): Advanced machine learning algorithms like XGBoost or LightGBM are often used for regression tasks due to their high accuracy.
-Neural Networks: Deep learning models could also be used if there is enough data to support them.
-4. Model Training
-Split your dataset into training and testing sets (usually 70% training, 30% testing).
-Train the selected model on the training set and evaluate its performance on the test set.
-Use metrics such as Mean Absolute Error (MAE), Mean Squared Error (MSE), or R-squared to evaluate the model's accuracy.
-5. Prediction
-Once the model is trained and validated, you can use it to predict the price of a new house based on its features.
-6. Model Improvement
-You can improve the model by tuning hyperparameters, selecting different features, or trying different machine learning algorithms
+# Housing-Price-Detection
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+dataset=pd.read_csv('/Churn_Modelling.csv')
+dataset.shape
+dataset.dtypes
+#check for missing value
+dataset.isnull().sum()
+dataset.dropna(inplace=True)
+#viewing the data statistics
+dataset.describe()
+#finding out the correlation between multiple columns
+corr=dataset.corr()
+corr.shape
+#plotting the heatmap of correlation between feature
+plt.figure(figsize=(20,20))
+sns.heatmap(corr,cbar=True ,square=True, fmt='.1f',annot=True,annot_kws={'size':15},cmap='Blues')
+#spliting target variable and independent variable
+x=dataset[['RM']]
+y=dataset[['MEDV']]
+x
+y
+#splitting to training and testing data
+from sklearn.model_selection import train_test_split
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.3,random_state=4)
+#import library for linear Regression
+from sklearn.linear_model import LinearRegression
+#create a linear regressor
+lm=LinearRegression()
+#train the model using the training sets
+lm.fit(x_train,y_train)
+#value of y intercept
+lm.intercept_
+#converting the cofficient value to a dataframe
+coeffcients=pd.DataFrame([x_train.columns,lm.coef_]).T
+coeffcients=coeffcients.rename(columns={0:'Attribute',1:'Coeffcients'})
+coeffcients
+y_pred=lm.predict(x_train)
+from sklearn import metrics
+#model evaluiation on train data
+print('MAE:',metrics.mean_absolute_error(y_train,y_pred))
+print('MSE:',metrics.mean_squared_error(y_train,y_pred))
+print('RMSE:',np.sqrt(metrics.mean_squared_error(y_train,y_pred)))
+plt.scatter(y_train,y_pred)
+sns.regplot(x=y_train,y=y_pred)
+plt.xlabel('Prices')
+plt.ylabel('predicted prices')
+plt.title('prices vs Predicted Prices')
+plt.show()
+plt.scatter(y_train,y_pred)
+plt.xlabel('Prices')
+plt.ylabel('predicted prices')
+plt.title('prices vs Predicted Prices')
+plt.show()
+sns.distplot(y_train-y_pred)
+plt.xlabel('Residuals')
+plt.ylabel('Frequency')
+plt.title('Distribution of Residuals')
